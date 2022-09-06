@@ -1,0 +1,104 @@
+#!/bin/sh -e
+#L:
+#L:  MIT License
+#L:  
+#l:  Bug reports, feature requests to gemini|https://harkadev.com/oss
+#l:  Copyright (c) 2022 Harkaitz Agirre, harkaitz.aguirre@gmail.com
+#L:
+#L:  Permission is hereby granted, free of charge, to any person obtaining
+#L:  a copy of this software and associated documentation files (the
+#L:  "Software"), to deal in the Software without restriction, including
+#L:  without limitation the rights to use, copy, modify, merge, publish,
+#L:  distribute, sublicense, and/or sell copies of the Software, and to
+#L:  permit persons to whom the Software is furnished to do so, subject to
+#L:  the following conditions:
+#L:
+#L:  The above copyright notice and this permission notice shall be
+#L:  included in all copies or substantial portions of the Software.
+#L:
+#L:  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#L:  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#L:  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+#L:  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+#L:  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+#L:  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+#L:  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+##:
+#h: Usage: $0 : Play TicTacToe interactively.
+##:
+tictactui() {
+    local g1="`mktemp`" g2="`mktemp`" t2="" move='' turn='' pl=''
+    tictactui_title
+    echo "Choose a player: 'x' (first) or 'o'."
+    echo -n ": "
+    read pl
+    case "${pl}" in
+        x) pl='x';;
+        o) pl='o';;
+        *) return 1;;
+    esac
+    tictactoe -g > "${g1}"
+    while true; do
+        if grep "^winner:" "${g1}" >/dev/null 2>&1; then
+            tictactui_show "${g1}"
+            echo -n "GAME OVER:"
+            read move
+            clear
+            echo "TicTacTui:"
+            sed -n 's/^ *#[l]: \{0,2\}//p' "$0"
+            break
+        fi
+        turn="`sed -n 's|turn: *||p' "${g1}"`"
+        if test @"${turn}" = @"${pl}"; then
+            tictactui_show "${g1}"
+            while true; do
+                echo -n "move: "
+                if ! read move; then
+                    return 1
+                fi
+                if ! tictactoe -a -m "${move}" < "${g1}" > "${g2}"; then
+                    continue
+                fi
+                break
+            done
+        else
+            tictactoe -ai < "${g1}" > "${g2}"
+        fi
+        cat "${g2}" > "${g1}"
+    done
+}
+tictactui_title() {
+    clear
+    echo '
+ _____ _   _____       _____     _
+|_   _(_)_|_   _|_ _ _|_   _|  _(_)
+  | | | / _|| |/ _` / _|| || || | |
+  |_| |_\__||_|\__,_\__||_| \_,_|_|
+
+                          CTRL-D to quit
+'
+}
+tictactui_show() {
+    tictactui_title
+    sed '
+    /^%/,/\./s|^|             |
+    s|^ *[%\.]||
+    /^players:/d
+    /^values:/d
+    ' "$@"
+}
+
+SCRNAME="`basename "$0"`"
+if test @"${SCRNAME}" = @"tictactui";then
+    case "${1}" in
+        -h|--help)
+            sed -n 's/^ *#h: \{0,1\}//p' "$0" | sed "s|\\\$0|${SCRNAME}|g"
+            echo ""
+            sed -n 's/^ *#l: \{0,2\}//p' "$0"
+            ;;
+        *)
+            export PATH="`dirname $0`:${PATH}"
+            tictactui "$@"
+            ;;
+    esac
+fi
