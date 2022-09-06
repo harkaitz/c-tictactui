@@ -10,16 +10,14 @@
 #endif
 
 #include "generic.h"
+#include "trim.h" /* Copied from "c-trim" project. */
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include <str/trim.h>
 #include <syslog.h>
-
-
 
 struct board_s {
     char    turn;
