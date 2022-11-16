@@ -7,22 +7,24 @@ CFLAGS   =-g -Wall
 
 all: $(PROGRAMS)
 clean:
-	rm -f $(PROGRAMS)
+	@echo "D $(PROGRAMS)"
+	@rm -f $(PROGRAMS)
 install:
-	install -d                  $(DESTDIR)$(PREFIX)/bin
-	install -m755 $(PROGRAMS)   $(DESTDIR)$(PREFIX)/bin
-	install -m755 $(SCRIPTS)    $(DESTDIR)$(PREFIX)/bin
-	install -d                  $(DESTDIR)$(PREFIX)/include/tictactui
-	install -m644 $(HEADERS)    $(DESTDIR)$(PREFIX)/include/tictactui
+	@echo "I bin/ $(PROGRAMS) $(SCRIPTS)"
+	@install -d                  $(DESTDIR)$(PREFIX)/bin
+	@install -m755 $(PROGRAMS)   $(DESTDIR)$(PREFIX)/bin
+	@install -m755 $(SCRIPTS)    $(DESTDIR)$(PREFIX)/bin
+	@echo "I include/tictactui/ $(HEADERS)"
+	@install -d                  $(DESTDIR)$(PREFIX)/include/tictactui
+	@install -m644 $(HEADERS)    $(DESTDIR)$(PREFIX)/include/tictactui
 
 ./tictactoe: tictactoe.c $(HEADERS)
-	$(CC) $(CFLAGS) -o $@ $<
+	@echo "B $@ $^"
+	@$(CC) $(CFLAGS) -o $@ $<
 ## -- license --
-ifneq ($(PREFIX),)
 install: install-license
 install-license: LICENSE
 	@echo 'I share/doc/c-tictactui/LICENSE'
 	@mkdir -p $(DESTDIR)$(PREFIX)/share/doc/c-tictactui
 	@cp LICENSE $(DESTDIR)$(PREFIX)/share/doc/c-tictactui
-endif
 ## -- license --
