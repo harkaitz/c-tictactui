@@ -1,5 +1,7 @@
-PROGRAMS = ./tictactoe
-SCRIPTS  = ./tictactui
+PROJECT  =c-tictactui
+VERSION  =1.0.0
+PROGRAMS =./tictactoe
+SCRIPTS  =./tictactui
 HEADERS  = board.h generic.h minimax.h
 PREFIX   =/usr/local
 CC       =cc
@@ -17,9 +19,14 @@ install:
 ## -- program
 ./tictactoe: tictactoe.c $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
-## -- license --
+## -- BLOCK:license --
 install: install-license
-install-license: LICENSE
-	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/c-tictactui
-	cp LICENSE $(DESTDIR)$(PREFIX)/share/doc/c-tictactui
-## -- license --
+install-license: 
+	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/$(PROJECT)
+	cp LICENSE README.md $(DESTDIR)$(PREFIX)/share/doc/$(PROJECT)
+update: update-license
+update-license:
+	ssnip README.md
+## -- BLOCK:license --
+## -- BLOCK:man --
+## -- BLOCK:man --
